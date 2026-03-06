@@ -1,0 +1,914 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Your Name — Public Health Research & Storytelling</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Outfit:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --deep:    #0d1117;
+    --navy:    #131b26;
+    --slate:   #1e2d3d;
+    --steel:   #2e4a5f;
+    --fog:     #8aa4b8;
+    --ice:     #d4e4ef;
+    --frost:   #f0f5f9;
+    --teal:    #3d9ea8;
+    --teal-lo: rgba(61,158,168,0.12);
+    --glass:   rgba(61,158,168,0.06);
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--deep);
+    color: var(--ice);
+    font-family: 'Outfit', sans-serif;
+    font-weight: 300;
+    line-height: 1.7;
+    overflow-x: hidden;
+  }
+
+  body::after {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23g)' opacity='0.035'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 9999;
+    opacity: 0.45;
+    mix-blend-mode: overlay;
+  }
+
+  .cursor {
+    width: 8px; height: 8px;
+    background: var(--teal);
+    border-radius: 50%;
+    position: fixed;
+    pointer-events: none;
+    z-index: 10000;
+    transform: translate(-50%,-50%);
+    transition: transform 0.07s;
+    mix-blend-mode: screen;
+  }
+
+  /* NAV */
+  nav {
+    position: fixed; top: 0; left: 0; right: 0;
+    z-index: 500;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1.8rem 5rem;
+  }
+  nav::before {
+    content: '';
+    position: absolute; inset: 0;
+    background: linear-gradient(to bottom, rgba(13,17,23,0.97) 0%, transparent 100%);
+    pointer-events: none;
+  }
+  .nav-logo {
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic; font-weight: 300;
+    font-size: 1.2rem; color: var(--ice);
+    text-decoration: none;
+    position: relative; z-index: 1; letter-spacing: 0.04em;
+  }
+  .nav-links { display: flex; gap: 3rem; list-style: none; position: relative; z-index: 1; }
+  .nav-links a {
+    color: var(--fog); text-decoration: none;
+    font-size: 0.72rem; letter-spacing: 0.18em; text-transform: uppercase;
+    transition: color 0.3s; position: relative;
+  }
+  .nav-links a::after {
+    content: ''; position: absolute; bottom: -3px; left: 0;
+    width: 0; height: 1px; background: var(--teal);
+    transition: width 0.3s ease;
+  }
+  .nav-links a:hover { color: var(--ice); }
+  .nav-links a:hover::after { width: 100%; }
+
+  /* HERO */
+  .hero {
+    min-height: 100vh;
+    display: grid; grid-template-columns: 55% 45%;
+    position: relative; overflow: hidden;
+  }
+  .hero-img-wrap { position: relative; overflow: hidden; }
+  .hero-img-wrap img {
+    width: 100%; height: 100%;
+    object-fit: cover; object-position: 70% center;
+    filter: saturate(0.7) contrast(1.1) brightness(0.8);
+    animation: heroZoom 18s ease-out forwards;
+  }
+  @keyframes heroZoom {
+    from { transform: scale(1.06); }
+    to   { transform: scale(1.0); }
+  }
+  .hero-img-wrap::after {
+    content: ''; position: absolute; inset: 0;
+    background: linear-gradient(to right, transparent 50%, var(--deep) 100%),
+                linear-gradient(to bottom, rgba(13,17,23,0.3) 0%, transparent 30%, rgba(13,17,23,0.5) 100%);
+  }
+  .hero-img-wrap::before {
+    content: ''; position: absolute; inset: 0;
+    background: linear-gradient(135deg, rgba(61,158,168,0.14), transparent 60%);
+    z-index: 1; mix-blend-mode: screen;
+  }
+  .hero-content {
+    display: flex; flex-direction: column; justify-content: center;
+    padding: 10rem 5rem 5rem 4rem;
+  }
+  .hero-label {
+    font-size: 0.68rem; letter-spacing: 0.28em; text-transform: uppercase;
+    color: var(--teal); margin-bottom: 2.5rem;
+    opacity: 0; animation: riseIn 0.9s 0.4s cubic-bezier(0.16,1,0.3,1) forwards;
+  }
+  .hero-headline {
+    font-family: 'Cormorant Garamond', serif; font-weight: 300;
+    font-size: clamp(3rem,5vw,6rem); line-height: 1.05; letter-spacing: -0.01em;
+    margin-bottom: 2.5rem;
+    opacity: 0; animation: riseIn 1s 0.6s cubic-bezier(0.16,1,0.3,1) forwards;
+  }
+  .hero-headline em { font-style: italic; color: var(--fog); display: block; }
+  .hero-body {
+    font-size: 1rem; color: var(--fog); max-width: 40ch; line-height: 1.85; margin-bottom: 3.5rem;
+    opacity: 0; animation: riseIn 1s 0.8s cubic-bezier(0.16,1,0.3,1) forwards;
+  }
+  .hero-actions {
+    display: flex; gap: 2rem; align-items: center;
+    opacity: 0; animation: riseIn 1s 1s cubic-bezier(0.16,1,0.3,1) forwards;
+  }
+  .btn-primary {
+    display: inline-block; background: var(--teal); color: var(--deep);
+    text-decoration: none; font-size: 0.78rem; font-weight: 500;
+    letter-spacing: 0.14em; text-transform: uppercase;
+    padding: 1rem 2.2rem; transition: background 0.3s, transform 0.3s;
+  }
+  .btn-primary:hover { background: var(--ice); transform: translateY(-2px); }
+  .btn-ghost {
+    display: inline-block; color: var(--fog); text-decoration: none;
+    font-size: 0.78rem; letter-spacing: 0.12em; text-transform: uppercase;
+    border-bottom: 1px solid var(--steel); padding-bottom: 0.2rem;
+    transition: color 0.3s, border-color 0.3s;
+  }
+  .btn-ghost:hover { color: var(--ice); border-color: var(--fog); }
+  .hero-stat-strip {
+    position: absolute; bottom: 3rem; right: 5rem;
+    display: flex; gap: 3rem;
+  }
+  .hero-stat { text-align: right; }
+  .hero-stat-num {
+    font-family: 'Cormorant Garamond', serif; font-size: 2.2rem;
+    font-weight: 300; color: var(--ice); line-height: 1;
+  }
+  .hero-stat-label {
+    font-size: 0.62rem; letter-spacing: 0.16em; text-transform: uppercase;
+    color: var(--fog); margin-top: 0.3rem;
+  }
+  @keyframes riseIn {
+    from { opacity:0; transform: translateY(28px); }
+    to   { opacity:1; transform: translateY(0); }
+  }
+
+  /* SHARED */
+  .section-label {
+    font-size: 0.66rem; letter-spacing: 0.28em; text-transform: uppercase;
+    color: var(--teal); margin-bottom: 1.2rem;
+  }
+  .section-title {
+    font-family: 'Cormorant Garamond', serif; font-weight: 300;
+    font-size: clamp(2.2rem,3.8vw,4rem); line-height: 1.15;
+    margin-bottom: 2rem; letter-spacing: -0.01em;
+  }
+  .section-title em { font-style: italic; color: var(--fog); }
+  .container { max-width: 1240px; margin: 0 auto; padding: 0 5rem; }
+  section { padding: 9rem 0; }
+
+  /* PHILOSOPHY */
+  .philosophy { background: var(--frost); color: var(--deep); }
+  .philosophy .section-label { color: var(--teal); }
+  .philosophy .section-title em { color: var(--steel); }
+  .phil-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 7rem; align-items: start; }
+  .phil-text p { font-size: 1.02rem; line-height: 1.95; color: #3a4a58; margin-bottom: 1.4rem; }
+  .phil-text strong { color: var(--deep); font-weight: 500; }
+  .phil-pull {
+    font-family: 'Cormorant Garamond', serif; font-weight: 300;
+    font-size: clamp(1.8rem,2.8vw,2.5rem); font-style: italic;
+    line-height: 1.45; color: var(--deep);
+    padding-left: 2.5rem; border-left: 2px solid var(--teal);
+    position: sticky; top: 8rem;
+  }
+  .phil-credentials { display: flex; flex-wrap: wrap; gap: 0.6rem; margin-top: 2.5rem; }
+  .cred-pill {
+    font-size: 0.7rem; letter-spacing: 0.1em; text-transform: uppercase;
+    color: var(--steel); border: 1px solid rgba(46,74,95,0.35);
+    padding: 0.3rem 0.9rem; border-radius: 2px;
+  }
+
+  /* SERVICES */
+  .services-intro {
+    display: grid; grid-template-columns: 1fr 1fr;
+    gap: 6rem; margin-bottom: 5rem; align-items: end;
+  }
+  .services-intro-text { font-size: 1.02rem; color: var(--fog); line-height: 1.9; }
+  .services-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 1px; background: rgba(138,164,184,0.1); }
+  .svc {
+    background: var(--navy); padding: 2.8rem;
+    position: relative; overflow: hidden; transition: background 0.4s;
+  }
+  .svc::before {
+    content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px;
+    background: var(--teal); transform: scaleX(0); transform-origin: left;
+    transition: transform 0.4s ease;
+  }
+  .svc:hover { background: var(--slate); }
+  .svc:hover::before { transform: scaleX(1); }
+  .svc-num {
+    font-family: 'Cormorant Garamond', serif; font-size: 4rem; font-weight: 300;
+    color: rgba(138,164,184,0.08); line-height: 1; margin-bottom: 1.8rem; letter-spacing: -0.02em;
+  }
+  .svc-title {
+    font-family: 'Cormorant Garamond', serif; font-size: 1.3rem; font-weight: 400;
+    color: var(--ice); margin-bottom: 1rem; line-height: 1.3;
+  }
+  .svc-desc { font-size: 0.88rem; color: var(--fog); line-height: 1.85; margin-bottom: 1.8rem; }
+  .svc-tags { display: flex; flex-wrap: wrap; gap: 0.45rem; }
+  .tag {
+    font-size: 0.62rem; letter-spacing: 0.1em; text-transform: uppercase;
+    color: var(--teal); border: 1px solid rgba(61,158,168,0.3);
+    padding: 0.22rem 0.65rem; border-radius: 1px; transition: background 0.3s;
+  }
+  .svc:hover .tag { background: var(--teal-lo); }
+
+  /* PHOTO STRIP */
+  .strip { padding: 0; background: #080d12; overflow: hidden; position: relative; }
+  .strip-label {
+    position: absolute; top: 50%; left: 50%;
+    transform: translate(-50%,-50%); z-index: 10;
+    text-align: center; pointer-events: none;
+  }
+  .strip-label-text {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(3rem,6vw,6.5rem); font-style: italic; font-weight: 300;
+    color: rgba(240,245,249,0.92); line-height: 1;
+    text-shadow: 0 0 80px rgba(13,17,23,0.8);
+  }
+  .strip-label-sub {
+    font-size: 0.7rem; letter-spacing: 0.25em; text-transform: uppercase;
+    color: var(--teal); margin-top: 0.8rem;
+  }
+  .photo-row { display: flex; height: 520px; }
+  .photo-row img {
+    flex: 1; object-fit: cover;
+    filter: saturate(0.6) contrast(1.1) brightness(0.65);
+    transition: filter 0.6s ease, flex 0.6s ease;
+  }
+  .photo-row img:hover {
+    filter: saturate(0.9) contrast(1.05) brightness(0.85); flex: 1.5;
+  }
+
+  /* CASE STUDIES */
+  .case-studies { background: var(--navy); }
+  .case-studies .section-title em { color: var(--fog); }
+  .cs-intro {
+    display: grid; grid-template-columns: 1fr 1fr;
+    gap: 6rem; align-items: end; margin-bottom: 5rem;
+  }
+  .cs-intro-text { font-size: 1rem; color: var(--fog); line-height: 1.9; }
+  .cs-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 2px; background: rgba(138,164,184,0.08); }
+  .cs-card {
+    background: var(--deep); padding: 3.5rem;
+    position: relative; overflow: hidden; transition: background 0.4s; cursor: default;
+  }
+  .cs-card.featured {
+    grid-column: 1 / -1;
+    display: grid; grid-template-columns: 1fr 1fr; gap: 4rem; align-items: center;
+  }
+  .cs-card:hover { background: #111820; }
+  .cs-overline {
+    font-size: 0.63rem; letter-spacing: 0.22em; text-transform: uppercase;
+    color: var(--teal); margin-bottom: 1rem;
+  }
+  .cs-title {
+    font-family: 'Cormorant Garamond', serif; font-size: 1.6rem; font-weight: 400;
+    line-height: 1.25; color: var(--ice); margin-bottom: 1.2rem;
+  }
+  .cs-card.featured .cs-title { font-size: clamp(1.8rem,2.5vw,2.4rem); }
+  .cs-desc { font-size: 0.9rem; color: var(--fog); line-height: 1.85; margin-bottom: 2rem; }
+  .cs-meta { display: flex; flex-wrap: wrap; gap: 1.5rem; margin-bottom: 2rem; }
+  .cs-meta-item { display: flex; flex-direction: column; gap: 0.2rem; }
+  .cs-meta-label { font-size: 0.6rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--steel); }
+  .cs-meta-value { font-size: 0.88rem; color: var(--ice); }
+  .cs-impact {
+    background: var(--teal-lo); border: 1px solid rgba(61,158,168,0.2);
+    padding: 1.5rem 2rem;
+  }
+  .cs-impact-label { font-size: 0.6rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--teal); margin-bottom: 0.5rem; }
+  .cs-impact-text {
+    font-family: 'Cormorant Garamond', serif; font-style: italic;
+    font-size: 1.05rem; color: var(--ice); line-height: 1.6;
+  }
+  .cs-visual { position: relative; aspect-ratio: 4/3; overflow: hidden; background: var(--slate); }
+  .cs-visual img {
+    width: 100%; height: 100%; object-fit: cover;
+    filter: saturate(0.5) contrast(1.1) brightness(0.7); transition: filter 0.5s;
+  }
+  .cs-card.featured:hover .cs-visual img { filter: saturate(0.8) contrast(1.05) brightness(0.8); }
+  .cs-visual-overlay {
+    position: absolute; inset: 0;
+    background: linear-gradient(135deg, rgba(61,158,168,0.18), transparent);
+    mix-blend-mode: screen;
+  }
+  .cs-stat { display: inline-flex; flex-direction: column; margin-bottom: 1.5rem; }
+  .cs-stat-num {
+    font-family: 'Cormorant Garamond', serif; font-size: 3.5rem; font-weight: 300;
+    color: var(--ice); line-height: 1; letter-spacing: -0.02em;
+  }
+  .cs-stat-desc { font-size: 0.78rem; color: var(--fog); margin-top: 0.3rem; }
+
+  /* PROCESS */
+  .process { background: var(--deep); }
+  .process-row {
+    display: grid; grid-template-columns: repeat(4,1fr); gap: 0;
+    margin-top: 5rem; border-top: 1px solid rgba(138,164,184,0.12);
+  }
+  .proc-step {
+    padding: 3rem 2.5rem 3rem 0;
+    border-right: 1px solid rgba(138,164,184,0.12); position: relative;
+  }
+  .proc-step:last-child { border-right: none; }
+  .proc-num { font-size: 0.65rem; letter-spacing: 0.2em; color: var(--teal); margin-bottom: 2rem; }
+  .proc-title { font-family: 'Cormorant Garamond', serif; font-size: 1.3rem; font-weight: 400; color: var(--ice); margin-bottom: 0.8rem; }
+  .proc-desc { font-size: 0.86rem; color: var(--fog); line-height: 1.85; }
+  .proc-step::before {
+    content: ''; position: absolute; top: -1px; left: 0;
+    width: 0; height: 2px; background: var(--teal); transition: width 0.7s ease;
+  }
+  .proc-step.line-visible::before { width: 55%; }
+
+  /* FOCUS */
+  .focus { background: var(--slate); }
+  .focus .section-title em { color: var(--fog); }
+  .focus-list { margin-top: 4rem; border-top: 1px solid rgba(138,164,184,0.12); }
+  .focus-item {
+    display: grid; grid-template-columns: 3rem 1fr auto;
+    align-items: baseline; gap: 2.5rem;
+    padding: 1.8rem 0; border-bottom: 1px solid rgba(138,164,184,0.1);
+    transition: padding-left 0.35s ease; cursor: default;
+  }
+  .focus-item:hover { padding-left: 1.2rem; }
+  .focus-idx { font-size: 0.62rem; color: rgba(138,164,184,0.4); letter-spacing: 0.15em; }
+  .focus-name {
+    font-family: 'Cormorant Garamond', serif; font-size: clamp(1.3rem,2.2vw,1.8rem);
+    font-weight: 300; color: var(--ice); transition: color 0.3s;
+  }
+  .focus-item:hover .focus-name { color: var(--teal); }
+  .focus-detail { font-size: 0.82rem; color: var(--fog); text-align: right; max-width: 28ch; line-height: 1.7; }
+
+  /* TAGLINE */
+  .tagline-section {
+    padding: 10rem 0; text-align: center; position: relative;
+    background: var(--deep); overflow: hidden;
+  }
+  .tagline-section::before {
+    content: ''; position: absolute; top: 50%; left: 50%;
+    transform: translate(-50%,-50%); width: 60vw; height: 60vw;
+    background: radial-gradient(circle, rgba(61,158,168,0.07) 0%, transparent 70%);
+    border-radius: 50%; pointer-events: none;
+  }
+  .tagline-text {
+    font-family: 'Cormorant Garamond', serif; font-size: clamp(3rem,7vw,7.5rem);
+    font-weight: 300; font-style: italic; line-height: 1.1;
+    color: var(--ice); position: relative; z-index: 1;
+  }
+  .tagline-text span { color: var(--teal); }
+  .tagline-cta {
+    margin-top: 3rem; position: relative; z-index: 1;
+    display: inline-block; color: var(--fog); font-size: 0.78rem;
+    letter-spacing: 0.2em; text-transform: uppercase; text-decoration: none;
+    border-bottom: 1px solid var(--steel); padding-bottom: 0.3rem;
+    transition: color 0.3s, border-color 0.3s;
+  }
+  .tagline-cta:hover { color: var(--teal); border-color: var(--teal); }
+
+  /* CONTACT */
+  .contact { background: var(--frost); color: var(--deep); }
+  .contact .section-label { color: var(--teal); }
+  .contact .section-title em { color: var(--steel); }
+  .contact-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8rem; align-items: start; }
+  .contact-left p { font-size: 1rem; color: #3a4a58; line-height: 1.9; margin-bottom: 1.2rem; }
+  .contact-aside { margin-top: 3rem; padding: 2rem 2.5rem; border: 1px solid rgba(46,74,95,0.25); background: rgba(61,158,168,0.04); }
+  .contact-aside-label { font-size: 0.62rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--teal); margin-bottom: 1rem; }
+  .contact-aside p { font-size: 0.9rem !important; color: #5a6a78 !important; margin-bottom: 0 !important; }
+  .contact-form { display: flex; flex-direction: column; gap: 2rem; }
+  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; }
+  .form-field { display: flex; flex-direction: column; gap: 0.5rem; }
+  .form-field label { font-size: 0.62rem; letter-spacing: 0.18em; text-transform: uppercase; color: #7a8a98; }
+  .form-field input,
+  .form-field textarea,
+  .form-field select {
+    background: transparent; border: none; border-bottom: 1px solid #c0d0dc;
+    padding: 0.7rem 0; font-family: 'Outfit', sans-serif;
+    font-size: 0.95rem; font-weight: 300; color: var(--deep);
+    outline: none; transition: border-color 0.3s; resize: none; appearance: none;
+  }
+  .form-field input:focus,
+  .form-field textarea:focus,
+  .form-field select:focus { border-color: var(--teal); }
+  .form-field select option { background: var(--frost); }
+  .submit-btn {
+    align-self: flex-start; background: var(--deep); color: var(--frost);
+    border: none; padding: 1.1rem 2.8rem;
+    font-family: 'Outfit', sans-serif; font-size: 0.75rem; font-weight: 500;
+    letter-spacing: 0.18em; text-transform: uppercase; cursor: pointer;
+    display: flex; align-items: center; gap: 1rem; transition: background 0.3s, gap 0.3s, color 0.3s;
+  }
+  .submit-btn:hover { background: var(--teal); color: var(--deep); gap: 1.6rem; }
+
+  /* FOOTER */
+  footer {
+    background: #080c10; padding: 3rem 5rem;
+    display: flex; justify-content: space-between; align-items: center;
+    border-top: 1px solid rgba(138,164,184,0.08);
+  }
+  .footer-logo { font-family: 'Cormorant Garamond', serif; font-style: italic; font-size: 1.1rem; color: var(--fog); font-weight: 300; }
+  .footer-copy { font-size: 0.72rem; color: var(--steel); letter-spacing: 0.06em; }
+  .footer-links { display: flex; gap: 2.5rem; }
+  .footer-links a { color: var(--steel); text-decoration: none; font-size: 0.7rem; letter-spacing: 0.14em; text-transform: uppercase; transition: color 0.3s; }
+  .footer-links a:hover { color: var(--fog); }
+
+  /* REVEAL */
+  .reveal {
+    opacity: 0; transform: translateY(32px);
+    transition: opacity 0.85s cubic-bezier(0.16,1,0.3,1), transform 0.85s cubic-bezier(0.16,1,0.3,1);
+  }
+  .reveal.visible { opacity: 1; transform: translateY(0); }
+  .stagger > * {
+    opacity: 0; transform: translateY(24px);
+    transition: opacity 0.7s cubic-bezier(0.16,1,0.3,1), transform 0.7s cubic-bezier(0.16,1,0.3,1);
+  }
+  .stagger.visible > *:nth-child(1) { opacity:1; transform:none; transition-delay:0s; }
+  .stagger.visible > *:nth-child(2) { opacity:1; transform:none; transition-delay:0.1s; }
+  .stagger.visible > *:nth-child(3) { opacity:1; transform:none; transition-delay:0.2s; }
+  .stagger.visible > *:nth-child(4) { opacity:1; transform:none; transition-delay:0.3s; }
+  .stagger.visible > *:nth-child(5) { opacity:1; transform:none; transition-delay:0.4s; }
+  .stagger.visible > *:nth-child(6) { opacity:1; transform:none; transition-delay:0.5s; }
+
+  /* RESPONSIVE */
+  @media (max-width: 960px) {
+    nav { padding: 1.2rem 2rem; }
+    .nav-links { display: none; }
+    .container { padding: 0 2rem; }
+    .hero { grid-template-columns: 1fr; }
+    .hero-img-wrap { height: 55vh; }
+    .hero-content { padding: 4rem 2rem; }
+    .hero-stat-strip { display: none; }
+    .phil-grid, .services-intro, .cs-intro, .contact-grid { grid-template-columns: 1fr; gap: 3rem; }
+    .cs-card.featured { grid-column: auto; grid-template-columns: 1fr; }
+    .cs-grid { grid-template-columns: 1fr; }
+    .process-row { grid-template-columns: 1fr 1fr; }
+    .services-grid { grid-template-columns: 1fr; }
+    .focus-item { grid-template-columns: 2.5rem 1fr; }
+    .focus-detail { display: none; }
+    footer { flex-direction: column; gap: 1.5rem; text-align: center; }
+    .form-row { grid-template-columns: 1fr; }
+    .photo-row { height: 260px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="cursor" id="cursor"></div>
+
+<!-- NAV -->
+<nav>
+  <a href="#" class="nav-logo">Your Name</a>
+  <ul class="nav-links">
+    <li><a href="#about">About</a></li>
+    <li><a href="#services">Services</a></li>
+    <li><a href="#casestudies">Work</a></li>
+    <li><a href="#process">Process</a></li>
+    <li><a href="#contact">Contact</a></li>
+  </ul>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-img-wrap">
+    <img src="DSCF8102.jpeg" alt="A person at the coastal edge, looking out to sea">
+  </div>
+  <div class="hero-content">
+    <p class="hero-label">Public Health · Research · Story</p>
+    <h1 class="hero-headline">
+      Knowledge<br>that <em>moves people.</em>
+    </h1>
+    <p class="hero-body">
+      I bridge the gap between research and the real world — turning evidence, data, and human insight into stories that shape policy, practice, and health.
+    </p>
+    <div class="hero-actions">
+      <a href="#services" class="btn-primary">See what I do</a>
+      <a href="#casestudies" class="btn-ghost">View work →</a>
+    </div>
+  </div>
+  <div class="hero-stat-strip">
+    <div class="hero-stat">
+      <div class="hero-stat-num">12+</div>
+      <div class="hero-stat-label">Years of research</div>
+    </div>
+    <div class="hero-stat">
+      <div class="hero-stat-num">6</div>
+      <div class="hero-stat-label">Domains of expertise</div>
+    </div>
+    <div class="hero-stat">
+      <div class="hero-stat-num">∞</div>
+      <div class="hero-stat-label">Stories to tell</div>
+    </div>
+  </div>
+</section>
+
+<!-- PHILOSOPHY / ABOUT -->
+<section class="philosophy" id="about">
+  <div class="container">
+    <div class="phil-grid">
+      <div class="phil-text reveal">
+        <p class="section-label">The Philosophy</p>
+        <h2 class="section-title">Research sits on shelves.<br><em>Stories change the world.</em></h2>
+        <p>There is no shortage of evidence. There is a chronic shortage of people who can take that evidence and make others <strong>care</strong> about it — deeply enough to act on it. That is the work I do.</p>
+        <p>My background spans population health, neuroscience, pathophysiology, and child development. But my real expertise is translation. I take complex, peer-reviewed knowledge and ask: <strong>how do we mobilize this so it can actually inform what happens next?</strong></p>
+        <p>Whether it's a white paper that lands on a policy-maker's desk, a data visualization that makes a finding undeniable, or a 1-pager distilling three years of dissertation research — I make knowledge usable, shareable, and impossible to set aside.</p>
+        <div class="phil-credentials">
+          <span class="cred-pill">Population Health</span>
+          <span class="cred-pill">Neuroscience</span>
+          <span class="cred-pill">Pathophysiology</span>
+          <span class="cred-pill">Child Development</span>
+          <span class="cred-pill">Systematic Reviews</span>
+          <span class="cred-pill">Health Communication</span>
+        </div>
+      </div>
+      <div class="phil-pull reveal">
+        "Everybody has a story.<br>What's yours?"
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SERVICES -->
+<section id="services">
+  <div class="container">
+    <div class="services-intro">
+      <div class="reveal">
+        <p class="section-label">What I Offer</p>
+        <h2 class="section-title">Where I can<br><em>help you.</em></h2>
+      </div>
+      <p class="services-intro-text reveal">I work with research teams, public health organizations, nonprofits, government agencies, and individuals who have something important to say — and need help saying it in a way that moves people.</p>
+    </div>
+    <div class="services-grid stagger">
+      <div class="svc">
+        <div class="svc-num">01</div>
+        <h3 class="svc-title">Research Translation & Knowledge Mobilization</h3>
+        <p class="svc-desc">Systematic reviews, literature syntheses, and research summaries transformed into accessible, actionable formats. I make your evidence impossible to ignore — and impossible to misfile.</p>
+        <div class="svc-tags">
+          <span class="tag">Systematic Reviews</span><span class="tag">White Papers</span>
+          <span class="tag">Policy Briefs</span><span class="tag">Evidence Summaries</span>
+        </div>
+      </div>
+      <div class="svc">
+        <div class="svc-num">02</div>
+        <h3 class="svc-title">Data Visualization & Analytical Storytelling</h3>
+        <p class="svc-desc">Numbers don't persuade people — stories do. I design compelling data narratives and visual reports that communicate complexity clearly, without losing the nuance that makes the work meaningful.</p>
+        <div class="svc-tags">
+          <span class="tag">Data Viz</span><span class="tag">Infographics</span>
+          <span class="tag">Research Reports</span><span class="tag">1-Pagers</span>
+        </div>
+      </div>
+      <div class="svc">
+        <div class="svc-num">03</div>
+        <h3 class="svc-title">Public Health Messaging & Campaigns</h3>
+        <p class="svc-desc">Health communication that actually reaches people. Grounded in behavioral science and built with empathy — from community-level health habit messaging to national campaign strategy frameworks.</p>
+        <div class="svc-tags">
+          <span class="tag">Health Comms</span><span class="tag">Behavior Change</span>
+          <span class="tag">Campaign Strategy</span><span class="tag">Messaging</span>
+        </div>
+      </div>
+      <div class="svc">
+        <div class="svc-num">04</div>
+        <h3 class="svc-title">Dissertation & Thesis Distillation</h3>
+        <p class="svc-desc">Years of rigorous research reduced to a clean, compelling document that honors the depth of your work while making it radically accessible to the people who need to act on it.</p>
+        <div class="svc-tags">
+          <span class="tag">Executive Briefs</span><span class="tag">Dissertation Summaries</span>
+          <span class="tag">Thesis Summaries</span>
+        </div>
+      </div>
+      <div class="svc">
+        <div class="svc-num">05</div>
+        <h3 class="svc-title">Child Development & Early Health Research</h3>
+        <p class="svc-desc">Specialized focus on pediatric and developmental science. Translating early-years research into frameworks that inform practitioners, caregivers, and the policies that shape how children grow.</p>
+        <div class="svc-tags">
+          <span class="tag">Child Health</span><span class="tag">Early Years</span>
+          <span class="tag">Developmental Science</span><span class="tag">Pediatrics</span>
+        </div>
+      </div>
+      <div class="svc">
+        <div class="svc-num">06</div>
+        <h3 class="svc-title">Strategy & Big-Picture Consulting</h3>
+        <p class="svc-desc">For organizations navigating complex public health challenges. I help you see the whole story — where the evidence points, where the gaps are, and what you should actually do next.</p>
+        <div class="svc-tags">
+          <span class="tag">Program Design</span><span class="tag">Strategic Advisory</span>
+          <span class="tag">Health Systems</span><span class="tag">Policy</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PHOTO STRIP -->
+<div class="strip" id="photography">
+  <div class="strip-label">
+    <p class="strip-label-text">Finding the story<br>in everything.</p>
+    <p class="strip-label-sub">Photography</p>
+  </div>
+  <div class="photo-row">
+    <img src="DSCF8102.jpeg" alt="Coastal path">
+    <img src="CC126928-651C-4A46-9540-6F372DBD3324.jpeg" alt="Train window reflection">
+    <img src="177442DD-658C-49D5-BEB4-6D103F9701E2.jpeg" alt="Train passengers through glass">
+    <img src="DCA95022-B544-4219-928A-4D81BAA32AA3-40201-000015C1967D1E95.jpeg" alt="City crossing">
+  </div>
+</div>
+
+<!-- CASE STUDIES -->
+<section class="case-studies" id="casestudies">
+  <div class="container">
+    <div class="cs-intro">
+      <div class="reveal">
+        <p class="section-label">Selected Work</p>
+        <h2 class="section-title">Turning research<br>into <em>real impact.</em></h2>
+      </div>
+      <p class="cs-intro-text reveal">These represent the kinds of projects I take on — and the outcomes that are possible when evidence is given the voice it deserves. Details changed for confidentiality where applicable.</p>
+    </div>
+    <div class="cs-grid stagger">
+
+      <!-- Featured -->
+      <div class="cs-card featured">
+        <div>
+          <p class="cs-overline">Knowledge Mobilization · Child Health</p>
+          <h3 class="cs-title">From 300-Page Dissertation to Policy Desk: Early Childhood Adversity Research</h3>
+          <p class="cs-desc">A doctoral researcher had spent four years producing ground-breaking findings on adverse childhood experiences (ACEs) and long-term neurological outcomes. The work was sitting in an institutional repository, largely unread. I condensed the research into a tiered knowledge translation package: a 2-page policy brief for government, a visual evidence summary for practitioners, and a public-facing 1-pager in plain language.</p>
+          <div class="cs-meta">
+            <div class="cs-meta-item">
+              <span class="cs-meta-label">Deliverables</span>
+              <span class="cs-meta-value">Policy brief · Practitioner summary · 1-pager</span>
+            </div>
+            <div class="cs-meta-item">
+              <span class="cs-meta-label">Sector</span>
+              <span class="cs-meta-value">Child & Family Health</span>
+            </div>
+            <div class="cs-meta-item">
+              <span class="cs-meta-label">Timeline</span>
+              <span class="cs-meta-value">3 weeks</span>
+            </div>
+          </div>
+          <div class="cs-impact">
+            <p class="cs-impact-label">Outcome</p>
+            <p class="cs-impact-text">"The brief was shared directly with the provincial health ministry within two weeks of delivery. The researcher said it was the first time her work felt like it could actually change something."</p>
+          </div>
+        </div>
+        <div class="cs-visual">
+          <img src="177442DD-658C-49D5-BEB4-6D103F9701E2.jpeg" alt="">
+          <div class="cs-visual-overlay"></div>
+        </div>
+      </div>
+
+      <!-- Case 2 -->
+      <div class="cs-card">
+        <p class="cs-overline">Data Storytelling · Population Health</p>
+        <div class="cs-stat">
+          <span class="cs-stat-num">34%</span>
+          <span class="cs-stat-desc">Increase in program engagement in pilot region (8 weeks)</span>
+        </div>
+        <h3 class="cs-title">Redesigning a Community Health Campaign That Wasn't Landing</h3>
+        <p class="cs-desc">A regional public health unit had data showing low uptake of a preventive health program despite significant outreach spend. I conducted a messaging audit, synthesized behavioral science literature, and rebuilt the campaign narrative around community identity and social proof rather than risk language. The redesigned materials were adopted province-wide.</p>
+        <div class="cs-meta">
+          <div class="cs-meta-item">
+            <span class="cs-meta-label">Deliverables</span>
+            <span class="cs-meta-value">Messaging audit · Campaign framework · Asset brief</span>
+          </div>
+          <div class="cs-meta-item">
+            <span class="cs-meta-label">Sector</span>
+            <span class="cs-meta-value">Public Health Unit</span>
+          </div>
+        </div>
+        <div class="cs-impact">
+          <p class="cs-impact-label">Outcome</p>
+          <p class="cs-impact-text">"Province-wide adoption following strong pilot results. The messaging reframe shifted the conversation from fear to agency."</p>
+        </div>
+      </div>
+
+      <!-- Case 3 -->
+      <div class="cs-card">
+        <p class="cs-overline">Systematic Review · Neuroscience & Child Development</p>
+        <div class="cs-stat">
+          <span class="cs-stat-num">87</span>
+          <span class="cs-stat-desc">Studies synthesized into one actionable evidence framework</span>
+        </div>
+        <h3 class="cs-title">Synthesizing the Evidence on Sleep, Cognition & School-Age Learning</h3>
+        <p class="cs-desc">An education nonprofit needed a rigorous but readable review of the neuroscience evidence on sleep and cognitive performance to support a new policy initiative. I conducted a full systematic review and produced tiered outputs: a technical evidence appendix, an executive summary for school board trustees, and a plain-language guide for parents.</p>
+        <div class="cs-meta">
+          <div class="cs-meta-item">
+            <span class="cs-meta-label">Deliverables</span>
+            <span class="cs-meta-value">Systematic review · Executive summary · Parent guide</span>
+          </div>
+          <div class="cs-meta-item">
+            <span class="cs-meta-label">Sector</span>
+            <span class="cs-meta-value">Education & Child Development</span>
+          </div>
+        </div>
+        <div class="cs-impact">
+          <p class="cs-impact-label">Outcome</p>
+          <p class="cs-impact-text">"Distributed to 14 school districts. The parent guide was later featured in a national parenting publication."</p>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- PROCESS -->
+<section id="process" class="process">
+  <div class="container">
+    <div class="reveal">
+      <p class="section-label">How It Works</p>
+      <h2 class="section-title">From evidence<br><em>to impact.</em></h2>
+    </div>
+    <div class="process-row stagger">
+      <div class="proc-step">
+        <p class="proc-num">01 — Listen</p>
+        <h3 class="proc-title">Understand the Story</h3>
+        <p class="proc-desc">Every project starts with deep listening. What exists? What's the gap? Who needs to care — and why don't they yet?</p>
+      </div>
+      <div class="proc-step">
+        <p class="proc-num">02 — Dig</p>
+        <h3 class="proc-title">Research & Synthesis</h3>
+        <p class="proc-desc">Systematic review, analysis, pattern recognition. I go wide and deep so the output is built on solid, defensible ground.</p>
+      </div>
+      <div class="proc-step">
+        <p class="proc-num">03 — Shape</p>
+        <h3 class="proc-title">Craft the Narrative</h3>
+        <p class="proc-desc">Data becomes story. Complex findings become something a policy-maker, practitioner, or patient can understand — and act on.</p>
+      </div>
+      <div class="proc-step">
+        <p class="proc-num">04 — Move</p>
+        <h3 class="proc-title">Mobilize Knowledge</h3>
+        <p class="proc-desc">Deliver outputs built to travel — briefs, visuals, white papers — designed to create real, lasting change.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOCUS -->
+<section class="focus" id="focus">
+  <div class="container">
+    <div class="reveal">
+      <p class="section-label">Expertise</p>
+      <h2 class="section-title">The territories<br><em>I know well.</em></h2>
+    </div>
+    <div class="focus-list stagger">
+      <div class="focus-item">
+        <span class="focus-idx">01</span>
+        <span class="focus-name">Population Health</span>
+        <span class="focus-detail">The big picture of how and why communities get sick — and how systems can change that</span>
+      </div>
+      <div class="focus-item">
+        <span class="focus-idx">02</span>
+        <span class="focus-name">Child Development</span>
+        <span class="focus-detail">Early years science, developmental trajectories, and translating findings for practitioners and caregivers</span>
+      </div>
+      <div class="focus-item">
+        <span class="focus-idx">03</span>
+        <span class="focus-name">Neuroscience</span>
+        <span class="focus-detail">Brain, behavior, and what the science says about how people actually learn, change, and heal</span>
+      </div>
+      <div class="focus-item">
+        <span class="focus-idx">04</span>
+        <span class="focus-name">Pathophysiology</span>
+        <span class="focus-detail">Understanding disease mechanisms to communicate health risk meaningfully and accurately</span>
+      </div>
+      <div class="focus-item">
+        <span class="focus-idx">05</span>
+        <span class="focus-name">Health Behavior & Habits</span>
+        <span class="focus-detail">Evidence-based frameworks for helping people and systems build lasting, healthier patterns</span>
+      </div>
+      <div class="focus-item">
+        <span class="focus-idx">06</span>
+        <span class="focus-name">Policy Translation</span>
+        <span class="focus-detail">Bridging the gap between research findings and the decisions that shape real lives</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- TAGLINE -->
+<div class="tagline-section">
+  <p class="tagline-text">Everybody has a story.<br><span>What's yours?</span></p>
+  <a href="#contact" class="tagline-cta">Let's find it together →</a>
+</div>
+
+<!-- CONTACT -->
+<section class="contact" id="contact">
+  <div class="container">
+    <div class="contact-grid">
+      <div class="reveal">
+        <p class="section-label">Get In Touch</p>
+        <h2 class="section-title">Ready to breathe<br><em>life into it?</em></h2>
+        <p>Whether you have research sitting in a drawer, data that needs a voice, or a public health challenge that needs a fresh perspective — I'd love to hear about it.</p>
+        <p>I work with research teams, public health organizations, nonprofits, government agencies, and individuals who have something important to say and need help saying it.</p>
+        <div class="contact-aside">
+          <p class="contact-aside-label">Currently Available For</p>
+          <p>Project-based consulting · Knowledge translation · White papers & policy briefs · Campaign strategy · Speaking & workshops</p>
+        </div>
+      </div>
+      <div class="contact-form reveal">
+        <div class="form-row">
+          <div class="form-field">
+            <label>Your Name</label>
+            <input type="text" placeholder="Jane Smith">
+          </div>
+          <div class="form-field">
+            <label>Organization</label>
+            <input type="text" placeholder="Health Authority / NGO / etc.">
+          </div>
+        </div>
+        <div class="form-field">
+          <label>Email</label>
+          <input type="email" placeholder="jane@organization.com">
+        </div>
+        <div class="form-field">
+          <label>What Are You Working On?</label>
+          <select>
+            <option value="" disabled selected>Select a service area</option>
+            <option>Research Translation / White Paper</option>
+            <option>Data Visualization / Reporting</option>
+            <option>Public Health Messaging / Campaign</option>
+            <option>Dissertation or Thesis Summary</option>
+            <option>Child Development Research</option>
+            <option>Strategy & Consulting</option>
+            <option>Something else entirely</option>
+          </select>
+        </div>
+        <div class="form-field">
+          <label>Tell Me More</label>
+          <textarea rows="5" placeholder="What's the story you need to tell? What's at stake?"></textarea>
+        </div>
+        <button class="submit-btn">Send message →</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <span class="footer-logo">Your Name</span>
+  <span class="footer-copy">© 2026 · Public Health Research & Storytelling</span>
+  <div class="footer-links">
+    <a href="#about">About</a>
+    <a href="#services">Services</a>
+    <a href="#casestudies">Work</a>
+    <a href="#contact">Contact</a>
+  </div>
+</footer>
+
+<script>
+  // Cursor
+  const cursor = document.getElementById('cursor');
+  document.addEventListener('mousemove', e => {
+    cursor.style.left = e.clientX + 'px';
+    cursor.style.top  = e.clientY + 'px';
+  });
+
+  // Scroll observer
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('visible');
+        if (entry.target.classList.contains('proc-step')) {
+          entry.target.classList.add('line-visible');
+        }
+        observer.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.12 });
+
+  document.querySelectorAll('.reveal, .stagger, .proc-step').forEach(el => observer.observe(el));
+
+  // Nav backdrop on scroll
+  const nav = document.querySelector('nav');
+  window.addEventListener('scroll', () => {
+    nav.style.backdropFilter = window.scrollY > 60 ? 'blur(14px)' : '';
+  });
+</script>
+</body>
+</html>
